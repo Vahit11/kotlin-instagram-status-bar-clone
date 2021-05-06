@@ -4,6 +4,9 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +18,18 @@ import com.squareup.picasso.Picasso
 import com.vahitkeskin.kotlininstagramstatusbarclone.R
 import de.hdodenhof.circleimageview.CircleImageView
 import java.lang.Exception
+import java.util.*
+import kotlin.collections.ArrayList
 
 class StatusBarAdapter(
     private val userName: ArrayList<String>,
     private val userImage: ArrayList<String>,
     private val context: Context
 ) : RecyclerView.Adapter<StatusBarAdapter.SBAViewHolder>() {
+
+    var number = 0
+    var runnable : Runnable = Runnable {  }
+    var handler: Handler = Handler(Looper.getMainLooper())
 
     private val statusBorderColors: Array<String> = arrayOf(
         "#403e91",
@@ -52,9 +61,10 @@ class StatusBarAdapter(
 
         val borderColor = Color.parseColor(statusBorderColors[position % 12])
         val imageViewStr = userImage[position]
+        val textViewStr = userName[position]
         civStatusBarUserImage.borderColor = borderColor
 
-        tvStatusBarUserName.text = userName[position]
+        tvStatusBarUserName.text = textViewStr
         println(userImage[position])
         Picasso.get().load(imageViewStr).into(civStatusBarUserImage, object : Callback {
             override fun onSuccess() {
@@ -68,20 +78,39 @@ class StatusBarAdapter(
         })
 
         holder.itemView.setOnClickListener {
-            Toast.makeText(context,"Click item user name: ${userName[position]}",Toast.LENGTH_LONG).show()
-            popUp(imageViewStr,borderColor)
+            popUp(textViewStr,imageViewStr,borderColor)
         }
     }
 
-    private fun popUp(strImage: String, intColorCode: Int) {
+    private fun popUp(strText: String, strImage: String, intColorCode: Int) {
         val dialog = Dialog(context,android.R.style.Theme_Translucent_NoTitleBar_Fullscreen)
         dialog.setContentView(R.layout.status_bar_pop_up)
 
         val popUpBackground = dialog.findViewById<LinearLayout>(R.id.statusBarPopUpLL)
         val popUpImageView = dialog.findViewById<ImageView>(R.id.statusBarPopUpIV)
+        val popUpImageTextView = dialog.findViewById<TextView>(R.id.statusBarPopUpTV)
+        val popUpImageCIV = dialog.findViewById<CircleImageView>(R.id.statusBarPopUpCIV)
+        val popUpProgressBar = dialog.findViewById<ProgressBar>(R.id.statusBarPopUpPB)
+
         Picasso.get().load(strImage).into(popUpImageView)
+        Picasso.get().load(strImage).into(popUpImageCIV)
+        popUpImageTextView.text = strText
 
         popUpBackground.setBackgroundColor(intColorCode)
+        number = 0
+
+        val timer = Timer()
+        val timerTask= object : TimerTask() {
+            override fun run() {
+                number++
+                popUpProgressBar.progress = number
+                if (number == 100) {
+                    timer.cancel()
+                    dialog.dismiss()
+                }
+            }
+        }
+        timer.schedule(timerTask,0,50)
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
