@@ -93,9 +93,9 @@ class StatusBarAdapter(
 
         popUpBackground.setBackgroundColor(intColorCode)
 
+        number = 0
         Picasso.get().load(userPostImage[userPosition]).into(popUpImageView, object : Callback {
             override fun onSuccess() {
-                number = 0
                 popUpProgressBarImage.isVisible = false
                 val timer = Timer()
                 val timerTask = object : TimerTask() {
