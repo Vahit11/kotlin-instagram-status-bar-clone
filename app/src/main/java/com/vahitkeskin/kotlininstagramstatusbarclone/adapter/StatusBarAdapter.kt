@@ -4,9 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.CountDownTimer
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,14 +20,14 @@ import kotlin.collections.ArrayList
 
 class StatusBarAdapter(
     private val userName: ArrayList<String>,
-    private val userImage: ArrayList<String>,
+    private val userProfileImage: ArrayList<String>,
+    private val userPostImage: ArrayList<String>,
     private val context: Context
 ) : RecyclerView.Adapter<StatusBarAdapter.SBAViewHolder>() {
 
     var number = 0
-    var runnable : Runnable = Runnable {  }
-    var handler: Handler = Handler(Looper.getMainLooper())
 
+    //Random colors: https://www.random.org/colors/hex
     private val statusBorderColors: Array<String> = arrayOf(
         "#403e91",
         "#8ee81f",
@@ -60,57 +57,65 @@ class StatusBarAdapter(
         val pbStatusBar = holder.itemView.findViewById<ProgressBar>(R.id.pbStatusBar)
 
         val borderColor = Color.parseColor(statusBorderColors[position % 12])
-        val imageViewStr = userImage[position]
-        val textViewStr = userName[position]
         civStatusBarUserImage.borderColor = borderColor
 
-        tvStatusBarUserName.text = textViewStr
-        println(userImage[position])
-        Picasso.get().load(imageViewStr).into(civStatusBarUserImage, object : Callback {
-            override fun onSuccess() {
-                pbStatusBar.isVisible = false
-            }
+        tvStatusBarUserName.text = userName[position]
+        Picasso.get().load(userProfileImage[position])
+            .into(civStatusBarUserImage, object : Callback {
+                override fun onSuccess() {
+                    pbStatusBar.isVisible = false
+                }
 
-            override fun onError(e: Exception?) {
-                pbStatusBar.isVisible = true
-            }
+                override fun onError(e: Exception?) {
+                    pbStatusBar.isVisible = true
+                }
 
-        })
+            })
 
         holder.itemView.setOnClickListener {
-            popUp(textViewStr,imageViewStr,borderColor)
+            popUp(position, borderColor)
         }
     }
 
-    private fun popUp(strText: String, strImage: String, intColorCode: Int) {
-        val dialog = Dialog(context,android.R.style.Theme_Translucent_NoTitleBar_Fullscreen)
+    private fun popUp(userPosition: Int, intColorCode: Int) {
+        val dialog = Dialog(context, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen)
         dialog.setContentView(R.layout.status_bar_pop_up)
 
         val popUpBackground = dialog.findViewById<LinearLayout>(R.id.statusBarPopUpLL)
         val popUpImageView = dialog.findViewById<ImageView>(R.id.statusBarPopUpIV)
         val popUpImageTextView = dialog.findViewById<TextView>(R.id.statusBarPopUpTV)
         val popUpImageCIV = dialog.findViewById<CircleImageView>(R.id.statusBarPopUpCIV)
-        val popUpProgressBar = dialog.findViewById<ProgressBar>(R.id.statusBarPopUpPB)
+        val popUpProgressBarPost = dialog.findViewById<ProgressBar>(R.id.statusBarPopUpPostPB)
+        val popUpProgressBarImage = dialog.findViewById<ProgressBar>(R.id.statusBarPopUpImagePB)
 
-        Picasso.get().load(strImage).into(popUpImageView)
-        Picasso.get().load(strImage).into(popUpImageCIV)
-        popUpImageTextView.text = strText
+        Picasso.get().load(userProfileImage[userPosition]).into(popUpImageCIV)
+        popUpImageTextView.text = userName[userPosition]
 
         popUpBackground.setBackgroundColor(intColorCode)
-        number = 0
 
-        val timer = Timer()
-        val timerTask= object : TimerTask() {
-            override fun run() {
-                number++
-                popUpProgressBar.progress = number
-                if (number == 100) {
-                    timer.cancel()
-                    dialog.dismiss()
+        Picasso.get().load(userPostImage[userPosition]).into(popUpImageView, object : Callback {
+            override fun onSuccess() {
+                number = 0
+                popUpProgressBarImage.isVisible = false
+                val timer = Timer()
+                val timerTask = object : TimerTask() {
+                    override fun run() {
+                        number++
+                        popUpProgressBarPost.progress = number
+                        if (number == 100) {
+                            timer.cancel()
+                            dialog.dismiss()
+                        }
+                    }
                 }
+                timer.schedule(timerTask, 0, 50)
             }
-        }
-        timer.schedule(timerTask,0,50)
+
+            override fun onError(e: Exception?) {
+                popUpProgressBarImage.isVisible = true
+            }
+
+        })
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()

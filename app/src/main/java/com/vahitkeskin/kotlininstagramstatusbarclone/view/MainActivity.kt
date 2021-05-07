@@ -10,7 +10,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var nameList = ArrayList<String>()
-    private var imageList = ArrayList<String>()
+    private var profileList = ArrayList<String>()
+    private var postList = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,8 +22,9 @@ class MainActivity : AppCompatActivity() {
 
         for(i in 1..12) {
             nameList.add("@user$i")
-            imageList.add("http://www.vahitkeskin.com/appUsers/userimage$i.png")
-            val statusBarAdapter = StatusBarAdapter(nameList,imageList,this)
+            profileList.add("http://www.vahitkeskin.com/appUsers/userimage$i.png")
+            postList.add("http://www.vahitkeskin.com/appUsers/post$i.jpg")
+            val statusBarAdapter = StatusBarAdapter(nameList,profileList,postList,this)
             binding.recyclerView.adapter = statusBarAdapter
             statusBarAdapter.notifyDataSetChanged()
         }

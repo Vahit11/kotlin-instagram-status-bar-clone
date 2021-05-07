@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/statusBarPopUpLL"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <ProgressBar
-        android:id="@+id/statusBarPopUpPB"
+        android:id="@+id/statusBarPopUpPostPB"
         style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:max="100"
         android:progress="0"
         android:progressTint="@android:color/holo_red_dark" />
@@ -25,8 +26,7 @@
             android:id="@+id/statusBarPopUpCIV"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:src="@drawable/ic_launcher_background" />
+            android:layout_margin="5dp" />
 
         <TextView
             android:id="@+id/statusBarPopUpTV"
@@ -39,17 +39,22 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/statusBarPopUpIV"
             android:layout_width="250dp"
             android:layout_height="250dp"
-            android:src="@drawable/ic_launcher_background" />
+            android:layout_centerInParent="true" />
 
-    </LinearLayout>
+        <ProgressBar
+            android:id="@+id/statusBarPopUpImagePB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
 
 </LinearLayout>
